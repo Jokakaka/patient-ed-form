@@ -249,7 +249,7 @@
             // Adiciona dados da tabela de horários (se existir)
             const scheduleTable = document.querySelector(".schedule-table");
             if (scheduleTable) {
-                content += "\n\nTabela de Horários de Medicamentos:\n";
+                content += "\n\nTabela de Horários de Medicamentos [Nome | Instruções | Manhã | Tarde | Noite]:\n";
 
                 const scheduleRows = scheduleTable.querySelectorAll("tbody tr");
                 scheduleRows.forEach((row, index) => {
