@@ -226,7 +226,7 @@
 
 
         function copyToClipboard() {
-            let content = "Medicamentos em Uso [Nome | Via | Dose | Instruções]:\n";
+            let content = "MEDICAMENTOS EM USO [Nome | Via | Dose | Instruções]:\n";
             const rows = tableBody.querySelectorAll("tr");
             rows.forEach((row, index) => {
                 const cells = row.querySelectorAll("textarea");
@@ -234,13 +234,13 @@
                 content += `  ${index + 1}. ${rowData}\n`;
             });
 
-            content += "\nInformação sobre os medicamentos:\n" + document.getElementById("notes").value.trim();
-            content += "\n\nContato para dúvidas e orientações:\n" + document.getElementById("notes2").value.trim();
+            content += "\nINFORMAÇÃO SOBRE OS MEDICAMENTOS:\n" + document.getElementById("notes").value.trim();
+            content += "\n\nCONTATO PARA DÚVIDAS E ORIENTAÇÕES\n" + document.getElementById("notes2").value.trim();
 
             // Adiciona dados da tabela de horários (se existir)
             const scheduleTable = document.querySelector(".schedule-table");
             if (scheduleTable) {
-                content += "\n\nTabela de Horários de Medicamentos [Nome | Instruções | Manhã | Tarde | Noite]:\n";
+                content += "\n\nTABELA DE HORÁRIOS DE MEDICAMENTOS [Nome | Instruções | Manhã | Tarde | Noite]:\n";
 
                 const scheduleRows = scheduleTable.querySelectorAll("tbody tr");
                 scheduleRows.forEach((row, index) => {
