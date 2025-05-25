@@ -81,7 +81,7 @@
             font-size: 14px;
             margin-bottom: 20px;
         }
-        
+
         #notes-print2 {
             display: none;
             white-space: pre-wrap;
@@ -155,9 +155,21 @@
         <tbody></tbody>
 
     </table>
+
     <div style="margin: 10px 0;">
         <button onclick="addTableRow()"><i data-lucide="plus-circle"></i>Adicionar Linha</button>
+        <button onclick="removeTableRow()" style="background-color: #e74c3c;"><i data-lucide="minus-circle"></i>Remover
+            Última Linha</button>
     </div>
+
+
+    <div style="margin-top: 30px;">
+        <button id="add-schedule-btn" onclick="addNewScheduleTable()">
+            <i data-lucide="plus-square"></i>Adicionar tabela de horários
+        </button>
+    </div>
+
+    <div id="additional-tables"></div>
 
     <h2><i data-lucide="info"></i>Informação sobre os medicamentos</h2>
     <textarea id="notes" class="notes" placeholder="Cole o texto aqui..."></textarea>
@@ -198,22 +210,36 @@
             tableBody.appendChild(row);
         }
 
+
         function copyToClipboard() {
-            let content = "Medicamentos em Uso: [Nome | Via | Dose | Instruções]\n";
+            let content = "Medicamentos em Uso [Nome | Via | Dose | Instruções]:\n";
             const rows = tableBody.querySelectorAll("tr");
             rows.forEach((row, index) => {
                 const cells = row.querySelectorAll("textarea");
                 const rowData = Array.from(cells).map(cell => cell.value.trim().replace(/\n/g, " / ")).join(" | ");
-                content += `>>> ${index + 1}: ${rowData}\n`;
+                content += `  ${index + 1}. ${rowData}\n`;
             });
 
             content += "\nInformação sobre os medicamentos:\n" + document.getElementById("notes").value.trim();
             content += "\n\nContato para dúvidas e orientações:\n" + document.getElementById("notes2").value.trim();
 
+            // Adiciona dados da tabela de horários (se existir)
+            const scheduleTable = document.querySelector(".schedule-table");
+            if (scheduleTable) {
+                content += "\n\nTabela de Horários de Medicamentos:\n";
+
+                const scheduleRows = scheduleTable.querySelectorAll("tbody tr");
+                scheduleRows.forEach((row, index) => {
+                    const cells = row.querySelectorAll("textarea");
+                    const rowData = Array.from(cells).map(cell => cell.value.trim().replace(/\n/g, " / ")).join(" | ");
+                    content += `  ${index + 1}. ${rowData}\n`;
+                });
+            }
+
             navigator.clipboard.writeText(content).then(() => {
-                alert("Conteúdo copiado!");
+                alert("Conteúdo copiado para a área de transferência!");
             }).catch(err => {
-                alert("Falha na cópia do conteúdo: " + err);
+                alert("Erro ao copiar o conteúdo: " + err);
             });
         }
 
@@ -247,7 +273,137 @@
             tableBody.appendChild(row);
         }
 
+        function removeTableRow() {
+            const rows = tableBody.querySelectorAll("tr");
+            if (rows.length > 0) {
+                rows[rows.length - 1].remove();
+            }
+        }
+
     </script>
+
+    <script>
+        function addNewScheduleTable() {
+            const container = document.getElementById("additional-tables");
+            const existingTable = container.querySelector(".schedule-table");
+
+            if (existingTable) {
+                alert("Você já adicionou uma tabela de horários.");
+                return;
+            }
+
+            const wrapper = document.createElement("div");
+            wrapper.style.marginTop = "20px";
+            wrapper.classList.add("schedule-wrapper");
+
+            const table = document.createElement("table");
+            table.classList.add("schedule-table");
+
+            const thead = document.createElement("thead");
+            thead.innerHTML = `
+            <tr>
+                <th style="background-color: #d0ebff;">Medicamentos em Uso</th>
+                <th style="background-color: #d0ebff;">Instruções</th>
+                <th>Manhã</th>
+                <th>Tarde</th>
+                <th>Noite</th>
+            </tr>
+        `;
+            table.appendChild(thead);
+
+            const tbody = document.createElement("tbody");
+            table.appendChild(tbody);
+
+            function addScheduleRow() {
+                const row = document.createElement("tr");
+                ["med", "instr", "manha", "tarde", "noite"].forEach((name, idx) => {
+                    const td = document.createElement("td");
+                    const textarea = document.createElement("textarea");
+                    textarea.name = `${name}[]`;
+                    textarea.wrap = "soft";
+                    textarea.addEventListener("input", () => autoResizeTextarea(textarea));
+                    autoResizeTextarea(textarea);
+
+                    if (idx < 2) {
+                        td.style.backgroundColor = "#d0ebff";
+                    }
+
+                    td.appendChild(textarea);
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            }
+
+            function removeScheduleRow() {
+                const rows = tbody.querySelectorAll("tr");
+                if (rows.length > 0) {
+                    rows[rows.length - 1].remove();
+                }
+            }
+
+            // Adiciona 6 linhas iniciais
+            for (let i = 0; i < 6; i++) {
+                addScheduleRow();
+            }
+
+            const addRowButton = document.createElement("button");
+            addRowButton.textContent = "Adicionar Linha";
+            addRowButton.style.marginTop = "10px";
+            addRowButton.style.marginRight = "10px";
+            addRowButton.onclick = () => addScheduleRow();
+
+            const removeRowButton = document.createElement("button");
+            removeRowButton.textContent = "Remover Última Linha";
+            removeRowButton.style.marginTop = "10px";
+            removeRowButton.style.marginRight = "10px";
+            removeRowButton.style.backgroundColor = "#e67e22";
+            removeRowButton.style.color = "white";
+            removeRowButton.style.border = "none";
+            removeRowButton.style.padding = "8px 14px";
+            removeRowButton.style.borderRadius = "4px";
+            removeRowButton.style.cursor = "pointer";
+            removeRowButton.onclick = () => removeScheduleRow();
+
+            const removeTableButton = document.createElement("button");
+            removeTableButton.textContent = "Remover tabela de horários";
+            removeTableButton.style.marginTop = "10px";
+            removeTableButton.style.backgroundColor = "#e74c3c";
+            removeTableButton.style.color = "white";
+            removeTableButton.style.border = "none";
+            removeTableButton.style.padding = "8px 14px";
+            removeTableButton.style.borderRadius = "4px";
+            removeTableButton.style.cursor = "pointer";
+            removeTableButton.onclick = () => {
+                container.innerHTML = "";
+            };
+
+            wrapper.appendChild(table);
+            wrapper.appendChild(addRowButton);
+            wrapper.appendChild(removeRowButton);
+            wrapper.appendChild(removeTableButton);
+            container.appendChild(wrapper);
+
+            lucide.createIcons();
+        }
+
+        let isFormDirty = false;
+
+        // Marca como alterado se qualquer textarea for modificado
+        document.querySelectorAll("textarea").forEach(area => {
+            area.addEventListener("input", () => {
+                isFormDirty = true;
+            });
+        });
+
+        // Alerta de saída só se houve modificação
+        window.addEventListener("beforeunload", function (e) {
+            if (isFormDirty) {
+                e.preventDefault();
+                e.returnValue = ""; // Isso ativa o aviso do navegador
+            }
+        });
+    </script>
+
 
 </body>
 
