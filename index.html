@@ -115,23 +115,46 @@
         }
 
         @media print {
-            textarea.notes {
-                display: none;
-            }
+    textarea.notes,
+    button,
+    svg {
+        display: none !important;
+    }
 
-            #notes-print {
-                display: block;
-            }
+    #notes-print,
+    #notes-print2 {
+        display: block;
+    }
 
-            #notes-print2 {
-                display: block;
-            }
+    /* Exibe valores digitados nos textareas das tabelas como texto */
+    textarea::before {
+        content: attr(value);
+        display: block;
+        white-space: pre-wrap;
+        color: #000;
+    }
 
-            button,
-            svg {
-                display: none;
-            }
-        }
+    textarea {
+        border: none;
+        background: transparent;
+        color: #000;
+        padding: 6px;
+        font-size: 14px;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .schedule-table,
+    .schedule-table th,
+    .schedule-table td {
+        border: 1px solid #000 !important;
+    }
+
+    .schedule-table textarea {
+        display: block;
+    }
+}
+        
     </style>
 </head>
 
