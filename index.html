@@ -57,7 +57,7 @@
             resize: none;
             padding: 8px;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 18px;
             box-sizing: border-box;
             line-height: 1.4;
             overflow: hidden;
@@ -78,7 +78,7 @@
             border: 1px solid #aaa;
             padding: 10px;
             background-color: #fff;
-            font-size: 14px;
+            font-size: 18px;
             margin-bottom: 20px;
         }
 
@@ -88,7 +88,7 @@
             border: 1px solid #aaa;
             padding: 10px;
             background-color: #fff;
-            font-size: 14px;
+            font-size: 18px;
             margin-bottom: 20px;
         }
 
@@ -115,52 +115,41 @@
         }
 
         @media print {
-    textarea.notes,
-    button,
-    svg {
-        display: none !important;
-    }
 
-    #notes-print,
-    #notes-print2 {
-        display: block;
-    }
+            textarea,
+            button,
+            svg {
+                display: none !important;
+            }
 
-    /* Exibe valores digitados nos textareas das tabelas como texto */
-    textarea::before {
-        content: attr(value);
-        display: block;
-        white-space: pre-wrap;
-        color: #000;
-    }
+            .print-text {
+                display: block !important;
+                white-space: pre-wrap;
+                padding: 6px;
+                font-size: 18px;
+                border: 1px solid #000;
+                min-height: 40px;
+                background-color: #fff;
+                margin-bottom: 4px;
+            }
 
-    textarea {
-        border: none;
-        background: transparent;
-        color: #000;
-        padding: 6px;
-        font-size: 14px;
-        height: auto !important;
-        overflow: visible !important;
-    }
+            #notes,
+            #notes2 {
+                display: none !important;
+            }
 
-    .schedule-table,
-    .schedule-table th,
-    .schedule-table td {
-        border: 1px solid #000 !important;
-    }
-
-    .schedule-table textarea {
-        display: block;
-    }
-}
-        
+            .schedule-table,
+            .schedule-table th,
+            .schedule-table td {
+                border: 1px solid #000 !important;
+            }
+        }
     </style>
 </head>
 
 <body>
     <img src="https://meds.cognys.com/assets/logo_meds-DdpIqYnN.png" height="100%">
-    <h1>Cognys Meds/Micromedex - Orientação de Alta - BETA</h1>
+    <h1>Cognys Meds/Micromedex - Orientação de Alta</h1>
 
     <h2>Nome do paciente:</h2>
     <h2>Contato:</h2>
@@ -169,7 +158,7 @@
     <table id="medication-table">
         <thead>
             <tr>
-                <th>Nome do Medicamento</th>
+                <th>Medicamento</th>
                 <th>Via</th>
                 <th>Dose</th>
                 <th>Instruções para Administração</th>
@@ -188,7 +177,7 @@
 
     <div style="margin-top: 30px;">
         <button id="add-schedule-btn" onclick="addNewScheduleTable()">
-            <i data-lucide="plus-square"></i>Adicionar tabela de horários
+            <i data-lucide="plus-square"></i>Adicionar Tabela de Horários
         </button>
     </div>
 
@@ -206,6 +195,8 @@
         <button onclick="preparePrint()"><i data-lucide="printer"></i>Imprimir</button>
         <button onclick="copyToClipboard()"><i data-lucide="clipboard-copy"></i>Copiar todo o Conteúdo</button>
     </div>
+
+    <p>Esta é uma versão Beta; melhorias serão feitas ao longo do tempo.</p>
 
     <script>
         lucide.createIcons(); // Renderiza os ícones
@@ -267,11 +258,16 @@
         }
 
         function preparePrint() {
-            const notesText = document.getElementById("notes").value;
-            document.getElementById("notes-print").textContent = notesText;
+            // Remove versões antigas (caso já tenha impresso antes)
+            document.querySelectorAll(".print-text").forEach(el => el.remove());
 
-            const notesText2 = document.getElementById("notes2").value;
-            document.getElementById("notes-print2").textContent = notesText2;
+            // Substitui cada textarea por um div com o mesmo conteúdo
+            document.querySelectorAll("textarea").forEach(textarea => {
+                const div = document.createElement("div");
+                div.className = "print-text";
+                div.textContent = textarea.value;
+                textarea.parentNode.insertBefore(div, textarea.nextSibling);
+            });
 
             window.print();
         }
@@ -324,8 +320,9 @@
 
             const thead = document.createElement("thead");
             thead.innerHTML = `
+            <h3><i data-lucide="clock"></i> Horários de Medicamentos</h3>
             <tr>
-                <th style="background-color: #d0ebff;">Medicamentos em Uso</th>
+                <th style="background-color: #d0ebff;">Medicamento</th>
                 <th style="background-color: #d0ebff;">Instruções</th>
                 <th>Manhã</th>
                 <th>Tarde</th>
